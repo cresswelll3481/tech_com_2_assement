@@ -1,21 +1,26 @@
 import pandas
 import math
-def string_checker(question, valid_ans_list, num_letters = 1):
-    """checks if the user has input a valid answer from a list and also allows for """
+def string_checker(question, valid_ans_list, num_letters = 1, exit_code = ""):
+    """checks if the user has input a valid answer from a list and also allows for an exit code """
     while True:
         response = input(question).lower()
+        if response == exit_code:
+            return "exit"
         for item in valid_ans_list:
+
             if response == item:
                 return item
             elif response == item[:num_letters]:
                 return item
+
         print(f"Please choose an option from {valid_ans_list}")
 
 def make_statement(statement, decoration):
     """formats a statement to make it look appealing to the user"""
     print(f"{decoration * 3} {statement} {decoration * 3}")
 def num_check(question, num_type, exit_code='xxx'):
-    """checks if the users number is more than 0"""
+    """checks if  users number is more than 0"""
+
     if num_type == "integer":
         error = "Please enter a integer more than zero"
         change_to = int
@@ -25,7 +30,10 @@ def num_check(question, num_type, exit_code='xxx'):
     while True:
         response = input(question).lower()
         if response == exit_code:
-            return response
+            return 0
+
+        if response == exit_code:
+            return None
         try:
             response = change_to(response)
             if response > 0:
@@ -34,21 +42,25 @@ def num_check(question, num_type, exit_code='xxx'):
                 print(error)
         except ValueError:
             print(error)
+
+def instructions():
+    make_statement("Instructions", "^")
+    print('''
+first input how many questions you would like to solve
+then you input if you are solving a area or perimeter question
+after that you input what shape you are solving
+then you input the dimensions of the shape
+    ''')
 #main routine
 # title
 make_statement("Welcome to the area/perimeter calculator","#")
-#instructions
-instructions = ("first input how many questions you would like to solve"
-                "then you input if you are solving a area or perimeter question"
-                "after that you input what shape you are solving"
-                "then you input the dimensions of the shape"
-                "")
+
 # initialise num_questions
 num_questions = 0
 # initialise lists/ pandas lists
 yes_no = ['yes', 'no']
-area_or_perimeter = ['area', 'perimeter', 'xxx']
-shapes = ['square', 'triangle', 'rectangle', 'circle', 'xxx']
+area_or_perimeter = ['area', 'perimeter']
+shapes = ['square', 'triangle', 'rectangle', 'circle']
 ans_list = []
 num_questions_list = []
 working_list = []
@@ -61,24 +73,25 @@ panda_dict = {
 }
 
 # prints instructions on request
-want_instructions = string_checker("Do you want to see the instructions? ",yes_no,1)
+want_instructions = string_checker("Do you want to see the instructions? ",yes_no,1, "xxx")
 if want_instructions == "yes":
-    make_statement("Instructions", "+")
-    print(instructions)
+    instructions()
 # asks the user how many questions
-how_many = num_check("How many questions do you want to solve? ", "int", "xxx")
+how_many = num_check("How many questions do you want to solve? ", "integer")
 
 # runs the questions
 while num_questions < how_many:
     num_questions += 1
     make_statement(f"Question {num_questions}", '-')
-    what_mode = string_checker("area or perimeter? ", area_or_perimeter,)
-    what_shape = string_checker("What shape are you trying to solve? ", shapes,)
-
+    what_mode = string_checker("area or perimeter? ", area_or_perimeter, 1,"xxx")
+    what_shape = string_checker("What shape are you trying to solve? ", shapes, 1, "xxx")
+    # checks if the code has to exit at the users request
+    if what_mode == "exit":
+        break
     # checks if the user is working out the perimeter
     if what_mode == "perimeter":
-        # checks if the exit code is used during a perimeter shape selection
-        if what_shape == "xxx":
+        # checks if the code has to exit at the users request
+        if what_shape == "exit":
             break
         # checks if the shape is a circle and if so then apply the right formula
         if what_shape == "circle":
@@ -99,8 +112,8 @@ while num_questions < how_many:
            else:
                tri_error = "you cant solve this questions without all 3 sides"
                print(tri_error)
-               ans = "n/a"
-               working = "n/a"
+               ans = 0
+               working = 0
 
         # checks if the shape is a square and if so then apply the right formula
         elif what_shape == "square":
@@ -116,8 +129,8 @@ while num_questions < how_many:
 
     #checks if it is working out the area
     if what_mode == "area":
-        # checks if the exit code is used during an area shape selection
-        if what_shape == "xxx":
+        # checks if the code has to exit at the users request
+        if what_shape == "exit":
             break
         # checks if the shape is a circle and if so then apply the right formula
         if what_shape == "circle":
@@ -141,20 +154,20 @@ while num_questions < how_many:
             height = num_check("what is the height? ", float)
             ans = height * base
             working = f"{height:.2f} × {base:.2f}"
-    # checks if the exit code (xxx) is used during area perimeter selection
-    elif what_mode == "xxx":
-        break
-    #prints the working
-    print(working)
-    # prints the answer
-    print()
+
+    # prints the answer and working
     if what_mode == "perimeter":
+
         if what_shape == "triangle" and have_sides == "no":
-            print(f"{ans}")
+            print(f"n/a")
+            working = "n/a"
+            print(working)
         else:
             print(f"the {what_mode} is {ans:.2f} units")
+            print(working)
     else:
         print(f"the {what_mode} is {ans:.2f} units squared")
+        print(working)
     #adds to a list at the end of a round
     ans_list.append(f"{ans:.2f}")
     num_questions_list.append(num_questions)
